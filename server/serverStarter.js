@@ -10,6 +10,13 @@ import { execSync } from 'child_process'  //To compile automatically the js file
 const app = new Koa()  //Create a new server
 const router = new Router()  //Create the routes
 
+//Check if 404 route exists, if it does, delete from routes and store it on route404 (to be used later)
+let route404 = undefined
+if (indexValues.routes['404']) {
+  route404 = indexValues.routes['404']
+  delete indexValues.routes['404']
+}
+
 //------------- GET TXT FILE OBJECT -----------------
 let fileChanges = {}
 try {
@@ -134,6 +141,29 @@ function compileCSSFiles() { //Function that will compile all the Scss files to 
   }
 }
 
+function createPartialsHtml(partials) { // function to create the partials html
+  if (partials) { //If there are any partials
+    let partialsHtml = "<div serverId='partials'>"
+    for (const partial of partials)   //Go through the partials and write the html code
+      partialsHtml += `<script serverId='${partial}' type='text/x-handlebars-template'>${fs.readFileSync(partialsPath[partial], 'utf8')} </script>`
+    partialsHtml += "</div>"
+    return partialsHtml
+  }
+  return ""
+}
+
+function createPageHtml(partials, route) {  // funtion to create the page html
+  return `
+  <script src='server/helper.js'></script>
+  <script src='serverCompiled/globalImports.js'></script>
+  ${fs.readFileSync(route.template, 'utf8')}    
+  ${partials}
+  ${route.js ? `<script src='${route.js.split('.')[0]}.js'></script>` : ``}
+  ${typeof route.startValues === 'object' ? `<x-startValues>${JSON.stringify(route.startValues)}</x-startValues>` : ``}
+  <script src='server/server.js'></script>
+  `
+}
+
 //------------- COMPILE JS (OR TS) -----------------
 if (indexValues.js) compileJSFiles('js', 'public/js')  //Compile all javascript files
 else if (indexValues.ts) compileJSFiles('ts', 'public/ts')  //Compile all typeScript files
@@ -145,32 +175,19 @@ compileCSSFiles()
 fs.writeFileSync('./server/fileChanges.txt', JSON.stringify(fileChanges)) //Save changes to txt file (to update the compiled file times)
 
 //------------- GET ALL PARTIALS -----------------
-const partials = getAllPartialFiles() //Get all partial files
+const partialsPath = getAllPartialFiles() //Get all partial files
 
 //------------- WRITE HTML AND ROUTES -----------------
 console.log("Creating routes")
 for (const [key, value] of Object.entries(indexValues.routes)) {  //Define routes
   //------------------- PARTIALS (CREATE HTML FOR THEM) -----------------------------
-  let partialsHtml = "" //variable containing partials html
-  if (value.partials) { //If there are any partials
-    partialsHtml = "<div serverId='partials'>"
-    for (const partial of value.partials)   //Go through the partials and write the html code
-      partialsHtml += `<script serverId='${partial}' type='text/x-handlebars-template'>${fs.readFileSync(partials[partial], 'utf8')} </script>`
-    partialsHtml += "</div>"
-  }
-  typeof value.startValues
+  const partialsHtml = createPartialsHtml(value.partials) //variable containing partials html
+ 
   //-------------------- ROUTES -----------------------------
   router.get(key, (ctx) => {  //Write the route
     ctx.type = 'html'
-    ctx.body = `
-<script src='server/helper.js'></script>
-<script src='serverCompiled/globalImports.js'></script>
-${fs.readFileSync(value.template, 'utf8')}    
-${partialsHtml}
-${value.js ? `<script src='${value.js.split('.')[0]}.js'></script>` : ``}
-${typeof value.startValues === 'object' ? `<x-startValues>${JSON.stringify(value.startValues)}</x-startValues>` : ``}
-<script src='server/server.js'></script>
-`})
+    ctx.body = createPageHtml(partialsHtml, value)
+  })
 }
 
 //------------- SERVE STATIC FILES -----------------
@@ -181,6 +198,13 @@ app.use(serve('public'))
 app
   .use(router.routes())
   .use(router.allowedMethods())
+
+app.use(async (ctx, next) => {
+    if(route404 && parseInt(ctx.status) === 404) {  //If there is a 404 status (route not found, set this route)
+       ctx.status = 404
+       ctx.body = createPageHtml(createPartialsHtml(route404.partials), route404)
+    }
+})
 
 app.listen(3000, () => {
     console.log('running on port 3000')

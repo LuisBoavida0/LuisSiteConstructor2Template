@@ -23,6 +23,9 @@ export const routes = { //Routes
     },
     '/home': {
         template: 'html/home.hbs',  //Only the template is required, the other are optional
+    },
+    '404': {    //404 route (when no route is matched, this route is used)
+        template: 'html/404.hbs',  //Only the template is required, the other are optional
     }
 }
 
