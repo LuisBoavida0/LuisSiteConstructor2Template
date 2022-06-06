@@ -1,0 +1,37 @@
+{{! Declare layout}}
+{{#> layout }}
+
+  {{! Add a partial}}
+  {{> header/header1 }}
+
+  {{! Variables from frontend}}
+  <div class="variables-div">
+    <p>This values were sent from the frontend JS:</p>
+    {{#each foo}}
+      <p>{{this}}</p>
+    {{/each}}
+    <p>{{foo2}}</p>
+  </div>
+
+  <br>
+
+  {{! Variable from backend}}
+  <div class="variables-div">
+    <p>This link came from backend:</p>
+    <a href="/{{nextPage}}"> click here to go to the next page: {{nextPage}} </a>
+  </div>
+
+
+  {{! elemId attribute to be able to be called on js}}
+  {{! when the project is compiled the elemId attribute will be removed but it still works}}
+  <button elemId='fooBtn'>Click Me to trigger the on click event!</button>
+  <form elemId='loginForm'>
+    <input type="text" elemId="username" placeholder="username">
+    <input type="password" elemId="password" placeholder="password">
+    <input type="submit" value="Login">
+  </form>
+
+  {{! element where we will inject code (from javascript)}}
+  <p elemId='endParagraph'>The folowing code was injected into this element: <br></p>
+  
+{{/layout}}

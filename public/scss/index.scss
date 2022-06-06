@@ -1,0 +1,48 @@
+//Add css here (To learn the advantages of sass visit here https://www.w3schools.com/sass/)
+body {
+    margin: 0;
+    
+    .variables-div {
+        display: flex;
+        flex-direction: column;
+        align-content: center;
+        flex-wrap: wrap;
+        font-weight: bold;
+
+        p { margin: 10px; }
+    }
+
+    form {
+        display: flex;
+        flex-direction: column;
+        align-content: center;
+        max-width: 500px;
+        margin: auto;
+        border: 2px solid black;
+        padding: 30px;
+        border-radius: 5px;
+
+        input {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+            &[type=submit] {
+                cursor: pointer;
+            }
+        }
+    }
+
+    button {
+        margin: 40px auto;
+        display: block;
+        padding: 20px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    >p {
+        background-color: pink;
+        font-weight: bolder;
+        text-align: center;
+    }
+}
