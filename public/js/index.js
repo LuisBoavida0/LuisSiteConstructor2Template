@@ -64,4 +64,4 @@ export function exportedFunction() {
 
 /* If you want to use another js file in the project, you have to declare them in here like this 
    (The compiler will them combine them)*/
-import './index2.js';
+import './index2.js'

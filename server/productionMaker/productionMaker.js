@@ -4,6 +4,7 @@ import { execSync } from 'child_process'  //To compile automatically the js file
 
 //SET THE PRODUCTION PROJECT NAME
 const productionFolder = "./productionProject"
+const htmlFolder = "./html"
 const projectStructure = {
     deleteFiles: [
         //IF YOU WANT TO DELETE A FILE THAT IT IS INCORRECTLY GOING TO PRODUCTION
@@ -65,7 +66,7 @@ fs.mkdirSync(productionFolder + "/public", { recursive: true }) //Create public 
 fs.mkdirSync(productionFolder + "/public/server", { recursive: true })  //Create server folder (empty)
 
 //Create files and folders
-copyFolderRecursiveSync("./html", productionFolder) //copy html folder
+copyFolderRecursiveSync(htmlFolder, productionFolder) //copy html folder
 copyFolderRecursiveSync("./public/compiled", productionFolder + "/public") //copy compiled folder
 copyFileSync("./public/server/helper.js", productionFolder + "/public/server/helper.js") //copy helper file
 copyFileSync("./public/server/server.js", productionFolder + "/public/server/server.js") //copy server file

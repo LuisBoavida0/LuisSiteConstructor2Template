@@ -165,8 +165,8 @@ function createPageHtml(partials, route) {  // funtion to create the page html
 }
 
 //------------- COMPILE JS (OR TS) -----------------
-if (indexValues.js) compileJSFiles('js', 'public/js')  //Compile all javascript files
-else if (indexValues.ts) compileJSFiles('ts', 'public/ts')  //Compile all typeScript files
+if (indexValues.js) compileJSFiles('js', indexValues.js)  //Compile all javascript files
+else if (indexValues.ts) compileJSFiles('ts', indexValues.ts)  //Compile all typeScript files
 else compileJSFiles('js', 'public/js')
 
 //------------- COMPILE SCSS INTO CSS -----------------
